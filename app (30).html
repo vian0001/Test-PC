@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ ULTRA BENCHMARK PRO - Complete System Test</title>
+    <style>
+        :root {
+            --bg: #030306;
+            --card: #0a0a12;
+            --border: rgba(255,255,255,0.08);
+            --cpu: #ff2d55;
+            --ram: #30d158;
+            --gpu: #bf5af2;
+            --total: #00d4ff;
+            --danger: #ff453a;
+            --warning: #ff9f0a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 20px 40px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 400px;
+            background: radial-gradient(ellipse, rgba(255, 45, 85, 0.2) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .logo {
+            font-size: 2.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--cpu), var(--warning), var(--gpu), var(--total));
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .tagline {
+            color: #888;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+        }
+
+        /* Timer Selection */
+        .timer-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .timer-title {
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--total);
+        }
+
+        .timer-grid {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .timer-btn {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: 2px solid var(--total);
+            background: transparent;
+            color: var(--total);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .timer-btn:hover, .timer-btn.active {
+            background: var(--total);
+            color: #000;
+            transform: scale(1.05);
+        }
+
+        .timer-btn.active {
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        /* Countdown Display */
+        .countdown-display {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--bg);
+            border-radius: 16px;
+        }
+
+        .countdown-label { font-size: 0.8rem; color: #666; text-transform: uppercase; }
+        .countdown-value { font-size: 4rem; font-weight: 900; color: var(--total); font-variant-numeric: tabular-nums; }
+        .countdown-progress {
+            width: 100%;
+            height: 8px;
+            background: #1a1a24;
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        .countdown-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--total), var(--gpu));
+            border-radius: 4px;
+            transition: width 0.1s;
+        }
+
+        /* Controls */
+        .controls {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .control-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover { transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-start {
+            background: linear-gradient(135deg, #00c853, #00e676);
+            color: #000;
+            font-size: 1.2rem;
+            padding: 18px 50px;
+            box-shadow: 0 0 30px rgba(0, 200, 83, 0.4);
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, #ff1744, #ff5252);
+            color: white;
+            font-size: 1.2rem;
+            padding: 18px 50px;
+        }
+
+        .btn-cpu { background: linear-gradient(135deg, var(--cpu), #ff6b8a); color: white; }
+        .btn-ram { background: linear-gradient(135deg, var(--ram), #5de888); color: #000; }
+        .btn-gpu { background: linear-gradient(135deg, var(--gpu), #d88aff); color: white; }
+
+        /* Worker Status */
+        .worker-status {
+            background: var(--bg);
+            border-radius: 14px;
+            padding: 18px;
+            margin-top: 20px;
+        }
+
+        .worker-title {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .worker-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .worker-dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #1a1a24;
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .worker-dot.active {
+            background: var(--cpu);
+            border-color: var(--cpu);
+            box-shadow: 0 0 15px var(--cpu);
+            animation: pulse 0.5s ease infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.15); }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border-radius: 14px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--stat-color);
+        }
+
+        .stat-card.cpu { --stat-color: var(--cpu); }
+        .stat-card.ram { --stat-color: var(--ram); }
+        .stat-card.gpu { --stat-color: var(--gpu); }
+        .stat-card.fps { --stat-color: var(--warning); }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--stat-color);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stat-sub {
+            font-size: 0.75rem;
+            color: #444;
+            margin-top: 4px;
+        }
+
+        /* Usage Grid */
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .usage-grid { grid-template-columns: 1fr; }
+        }
+
+        .usage-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .usage-card.stress { animation: stressGlow 0.5s ease infinite alternate; }
+        .usage-card.cpu-card.stress { --glow-color: var(--cpu); }
+        .usage-card.ram-card.stress { --glow-color: var(--ram); }
+        .usage-card.gpu-card.stress { --glow-color: var(--gpu); }
+
+        @keyframes stressGlow {
+            from { box-shadow: 0 0 0 0 var(--glow-color, transparent); }
+            to { box-shadow: 0 0 30px 3px var(--glow-color, transparent); }
+        }
+
+        .usage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .usage-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .usage-icon.cpu { background: linear-gradient(135deg, var(--cpu), #ff6b8a); }
+        .usage-icon.ram { background: linear-gradient(135deg, var(--ram), #5de888); }
+        .usage-icon.gpu { background: linear-gradient(135deg, var(--gpu), #d88aff); }
+
+        .usage-percent { font-size: 2.5rem; font-weight: 900; }
+        .usage-percent.cpu { color: var(--cpu); }
+        .usage-percent.ram { color: var(--ram); }
+        .usage-percent.gpu { color: var(--gpu); }
+
+        /* Progress Ring */
+        .progress-ring {
+            width: 160px;
+            height: 160px;
+            margin: 15px auto;
+            position: relative;
+        }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .progress-ring circle {
+            fill: none;
+            stroke-width: 10;
+            stroke-linecap: round;
+        }
+
+        .progress-ring .bg { stroke: #1a1a24; }
+        .progress-ring .progress {
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 0.15s;
+        }
+
+        .progress-ring.cpu .progress { stroke: var(--cpu); filter: drop-shadow(0 0 8px var(--cpu)); }
+        .progress-ring.ram .progress { stroke: var(--ram); filter: drop-shadow(0 0 8px var(--ram)); }
+        .progress-ring.gpu .progress { stroke: var(--gpu); filter: drop-shadow(0 0 8px var(--gpu)); }
+
+        .progress-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.2rem;
+            font-weight: 900;
+        }
+
+        /* Metrics */
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .metric {
+            background: var(--bg);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .metric-label { font-size: 0.65rem; color: #444; text-transform: uppercase; }
+        .metric-value { font-size: 0.9rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+        /* Canvas */
+        .canvas-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .canvas-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .canvas-title { font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .canvas-stats { display: flex; gap: 15px; font-size: 0.8rem; }
+        .canvas-stat span:first-child { color: #555; }
+        .canvas-stat span:last-child { color: var(--gpu); font-weight: 700; }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        #gpuCanvas { width: 100%; height: 100%; }
+
+        /* Score Categories */
+        .score-categories {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .categories-title {
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: var(--bg);
+        }
+
+        .category-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 0.75rem;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .category-badge.legendary { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; }
+        .category-badge.extreme { background: linear-gradient(135deg, #ff0844, #ff4444); color: #fff; }
+        .category-badge.excellent { background: var(--ram); color: #000; }
+        .category-badge.good { background: var(--total); color: #000; }
+        .category-badge.average { background: var(--warning); color: #000; }
+        .category-badge.poor { background: #666; color: #fff; }
+
+        .category-range { font-size: 0.85rem; color: #888; }
+
+        /* Results Section */
+        .results-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            display: none;
+        }
+
+        .results-section.show { display: block; }
+
+        .results-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 25px;
+            color: var(--total);
+        }
+
+        .final-score {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .final-score-label { font-size: 0.9rem; color: #666; text-transform: uppercase; letter-spacing: 3px; }
+        .final-score-value {
+            font-size: 6rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--cpu), var(--total), var(--gpu));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.1;
+        }
+
+        .score-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 700px) {
+            .score-stats-grid { grid-template-columns: 1fr; }
+        }
+
+        .score-stat-card {
+            background: var(--bg);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .score-stat-title { font-size: 0.8rem; color: #555; text-transform: uppercase; margin-bottom: 10px; }
+        .score-stat-values { display: flex; justify-content: space-around; gap: 10px; }
+        .score-stat-item { }
+        .score-stat-item .label { font-size: 0.65rem; color: #444; }
+        .score-stat-item .value { font-size: 1.3rem; font-weight: 800; }
+        .score-stat-item .value.min { color: var(--danger); }
+        .score-stat-item .value.avg { color: var(--warning); }
+        .score-stat-item .value.max { color: var(--ram); }
+
+        /* Live Score */
+        .live-score {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .live-score::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--cpu), var(--ram), var(--gpu), var(--total));
+        }
+
+        .live-score-label { font-size: 0.85rem; color: #555; text-transform: uppercase; letter-spacing: 3px; }
+        .live-score-value {
+            font-size: 5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--cpu), var(--total), var(--gpu));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        .live-breakdown {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin-top: 20px;
+        }
+
+        .breakdown-item { text-align: center; }
+        .breakdown-label { font-size: 0.7rem; color: #444; text-transform: uppercase; }
+        .breakdown-value { font-size: 1.8rem; font-weight: 800; }
+        .breakdown-value.cpu { color: var(--cpu); }
+        .breakdown-value.ram { color: var(--ram); }
+        .breakdown-value.gpu { color: var(--gpu); }
+
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+
+        .chart-card {
+            background: var(--card);
+            border-radius: 14px;
+            padding: 18px;
+            border: 1px solid var(--border);
+        }
+
+        .chart-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chart-title.cpu { color: var(--cpu); }
+        .chart-title.ram { color: var(--ram); }
+        .chart-title.gpu { color: var(--gpu); }
+
+        .chart-container { height: 100px; }
+        .chart-container canvas { width: 100%; height: 100%; }
+
+        /* Log */
+        .log-section {
+            background: var(--card);
+            border-radius: 14px;
+            padding: 18px;
+            border: 1px solid var(--border);
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .log-title { font-weight: 700; font-size: 0.9rem; }
+
+        .log-container {
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 12px;
+            max-height: 180px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.75rem;
+        }
+
+        .log-entry {
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            display: flex;
+            gap: 8px;
+        }
+
+        .log-time { color: #333; min-width: 65px; }
+        .log-type { min-width: 45px; font-weight: 600; }
+        .log-type.info { color: var(--total); }
+        .log-type.cpu { color: var(--cpu); }
+        .log-type.ram { color: var(--ram); }
+        .log-type.gpu { color: var(--gpu); }
+        .log-type.warn { color: var(--warning); }
+        .log-type.done { color: var(--ram); }
+        .log-msg { color: #666; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--total); border-radius: 3px; }
+
+        @media (max-width: 600px) {
+            .logo { font-size: 1.6rem; }
+            .btn { padding: 10px 18px; font-size: 0.8rem; }
+            .btn-start, .btn-stop { padding: 14px 30px; font-size: 1rem; }
+            .live-score-value { font-size: 3.5rem; }
+            .final-score-value { font-size: 4rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .countdown-value { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1 class="logo">⚡ ULTRA BENCHMARK PRO</h1>
+            <p class="tagline">COMPLETE SYSTEM STRESS TEST WITH TIMED BENCHMARKS</p>
+        </header>
+
+        <!-- Timer Selection -->
+        <div class="timer-section">
+            <div class="timer-title">⏱️ SELECT BENCHMARK DURATION</div>
+            <div class="timer-grid">
+                <button class="timer-btn" data-time="60">1 MIN</button>
+                <button class="timer-btn" data-time="120">2 MIN</button>
+                <button class="timer-btn active" data-time="300">5 MIN</button>
+                <button class="timer-btn" data-time="600">10 MIN</button>
+            </div>
+            <div class="countdown-display">
+                <div class="countdown-label">Time Remaining</div>
+                <div class="countdown-value" id="countdown">05:00</div>
+                <div class="countdown-progress">
+                    <div class="countdown-bar" id="countdownBar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="control-grid">
+                <button class="btn btn-start" id="btnStart">▶️ START BENCHMARK</button>
+                <button class="btn btn-stop" id="btnStop" disabled>⏹️ STOP</button>
+            </div>
+            <div class="control-grid" style="margin-top: 15px;">
+                <button class="btn btn-cpu" id="btnCpu">🔴 CPU Only</button>
+                <button class="btn btn-ram" id="btnRam">🟢 RAM Only</button>
+                <button class="btn btn-gpu" id="btnGpu">🟣 GPU Only</button>
+            </div>
+            <div class="worker-status">
+                <div class="worker-title">CPU WORKER THREADS (<span id="coreCount">0</span> Cores Detected)</div>
+                <div class="worker-grid" id="workerGrid"></div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card cpu">
+                <div class="stat-label">CPU Load</div>
+                <div class="stat-value" id="cpuUsageSmall">0%</div>
+                <div class="stat-sub">Workers: <span id="activeWorkers">0</span></div>
+            </div>
+            <div class="stat-card ram">
+                <div class="stat-label">RAM Used</div>
+                <div class="stat-value" id="ramUsageSmall">0 MB</div>
+                <div class="stat-sub">Buffers: <span id="bufferCount">0</span></div>
+            </div>
+            <div class="stat-card gpu">
+                <div class="stat-label">GPU Load</div>
+                <div class="stat-value" id="gpuUsageSmall">0%</div>
+                <div class="stat-sub">Particles: <span id="particleCount">0</span></div>
+            </div>
+            <div class="stat-card fps">
+                <div class="stat-label">Render FPS</div>
+                <div class="stat-value" id="fpsDisplay">0</div>
+                <div class="stat-sub">Uncapped | Max: <span id="fpsMax">0</span></div>
+            </div>
+        </div>
+
+        <!-- Usage Cards -->
+        <div class="usage-grid">
+            <div class="usage-card cpu-card" id="cpuCard">
+                <div class="usage-header">
+                    <div class="usage-icon cpu">🔥</div>
+                    <div class="usage-percent cpu" id="cpuPercent">0%</div>
+                </div>
+                <div class="progress-ring cpu">
+                    <svg viewBox="0 0 160 160">
+                        <circle class="bg" cx="80" cy="80" r="70"/>
+                        <circle class="progress" cx="80" cy="80" r="70" id="cpuRing"/>
+                    </svg>
+                    <div class="progress-value" id="cpuRingValue" style="color: var(--cpu);">0</div>
+                </div>
+                <div style="font-weight: 700; margin-bottom: 4px;">CPU STRESS</div>
+                <div style="font-size: 0.75rem; color: #555;" id="cpuStatus">Ready</div>
+                <div class="metrics">
+                    <div class="metric"><div class="metric-label">Operations</div><div class="metric-value" id="cpuOps">0</div></div>
+                    <div class="metric"><div class="metric-label">Ops/Sec</div><div class="metric-value" id="cpuOpsPerSec">0</div></div>
+                    <div class="metric"><div class="metric-label">Threads</div><div class="metric-value" id="cpuThreads">0</div></div>
+                    <div class="metric"><div class="metric-label">Score</div><div class="metric-value" id="cpuScore">0</div></div>
+                </div>
+            </div>
+
+            <div class="usage-card ram-card" id="ramCard">
+                <div class="usage-header">
+                    <div class="usage-icon ram">💾</div>
+                    <div class="usage-percent ram" id="ramPercent">0%</div>
+                </div>
+                <div class="progress-ring ram">
+                    <svg viewBox="0 0 160 160">
+                        <circle class="bg" cx="80" cy="80" r="70"/>
+                        <circle class="progress" cx="80" cy="80" r="70" id="ramRing"/>
+                    </svg>
+                    <div class="progress-value" id="ramRingValue" style="color: var(--ram);">0</div>
+                </div>
+                <div style="font-weight: 700; margin-bottom: 4px;">RAM STRESS</div>
+                <div style="font-size: 0.75rem; color: #555;" id="ramStatus">Ready</div>
+                <div class="metrics">
+                    <div class="metric"><div class="metric-label">Allocated</div><div class="metric-value" id="ramAllocated">0 MB</div></div>
+                    <div class="metric"><div class="metric-label">Write MB/s</div><div class="metric-value" id="ramWrite">0</div></div>
+                    <div class="metric"><div class="metric-label">Buffers</div><div class="metric-value" id="ramBuffers">0</div></div>
+                    <div class="metric"><div class="metric-label">Score</div><div class="metric-value" id="ramScore">0</div></div>
+                </div>
+            </div>
+
+            <div class="usage-card gpu-card" id="gpuCard">
+                <div class="usage-header">
+                    <div class="usage-icon gpu">🎮</div>
+                    <div class="usage-percent gpu" id="gpuPercent">0%</div>
+                </div>
+                <div class="progress-ring gpu">
+                    <svg viewBox="0 0 160 160">
+                        <circle class="bg" cx="80" cy="80" r="70"/>
+                        <circle class="progress" cx="80" cy="80" r="70" id="gpuRing"/>
+                    </svg>
+                    <div class="progress-value" id="gpuRingValue" style="color: var(--gpu);">0</div>
+                </div>
+                <div style="font-weight: 700; margin-bottom: 4px;">GPU STRESS</div>
+                <div style="font-size: 0.75rem; color: #555;" id="gpuStatus">Ready</div>
+                <div class="metrics">
+                    <div class="metric"><div class="metric-label">Particles</div><div class="metric-value" id="gpuParticles">0</div></div>
+                    <div class="metric"><div class="metric-label">Draw Calls</div><div class="metric-value" id="gpuDrawCalls">0</div></div>
+                    <div class="metric"><div class="metric-label">Triangles</div><div class="metric-value" id="gpuTriangles">0</div></div>
+                    <div class="metric"><div class="metric-label">Score</div><div class="metric-value" id="gpuScore">0</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GPU Canvas -->
+        <div class="canvas-section">
+            <div class="canvas-header">
+                <div class="canvas-title">🎨 GPU Render Output</div>
+                <div class="canvas-stats">
+                    <div class="canvas-stat"><span>Particles:</span> <span id="canvasParticles">0</span></div>
+                    <div class="canvas-stat"><span>FPS:</span> <span id="canvasFps">0</span></div>
+                </div>
+            </div>
+            <div class="canvas-container">
+                <canvas id="gpuCanvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Score Categories Reference -->
+        <div class="score-categories">
+            <div class="categories-title">📊 SCORE CATEGORIES</div>
+            <div class="categories-grid">
+                <div class="category-item">
+                    <span class="category-badge legendary">🏆 LEGENDARY</span>
+                    <span class="category-range">≥ 5,000,000</span>
+                </div>
+                <div class="category-item">
+                    <span class="category-badge extreme">🔥 EXTREME</span>
+                    <span class="category-range">2,000,000 - 4,999,999</span>
+                </div>
+                <div class="category-item">
+                    <span class="category-badge excellent">⭐ EXCELLENT</span>
+                    <span class="category-range">1,000,000 - 1,999,999</span>
+                </div>
+                <div class="category-item">
+                    <span class="category-badge good">✓ GOOD</span>
+                    <span class="category-range">500,000 - 999,999</span>
+                </div>
+                <div class="category-item">
+                    <span class="category-badge average">◆ AVERAGE</span>
+                    <span class="category-range">200,000 - 499,999</span>
+                </div>
+                <div class="category-item">
+                    <span class="category-badge poor">○ POOR</span>
+                    <span class="category-range">< 200,000</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Score -->
+        <div class="live-score">
+            <div class="live-score-label">Current Total Score</div>
+            <div class="live-score-value" id="totalScore">0</div>
+            <div id="scoreRating"></div>
+            <div class="live-breakdown">
+                <div class="breakdown-item">
+                    <div class="breakdown-label">CPU</div>
+                    <div class="breakdown-value cpu" id="breakdownCpu">0</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-label">RAM</div>
+                    <div class="breakdown-value ram" id="breakdownRam">0</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-label">GPU</div>
+                    <div class="breakdown-value gpu" id="breakdownGpu">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Results (hidden until complete) -->
+        <div class="results-section" id="resultsSection">
+            <div class="results-title">🏁 BENCHMARK COMPLETE!</div>
+            <div class="final-score">
+                <div class="final-score-label">Final Score</div>
+                <div class="final-score-value" id="finalScore">0</div>
+                <div id="finalRating"></div>
+            </div>
+            <div class="score-stats-grid">
+                <div class="score-stat-card">
+                    <div class="score-stat-title">🔴 CPU Score</div>
+                    <div class="score-stat-values">
+                        <div class="score-stat-item"><div class="label">MIN</div><div class="value min" id="cpuMin">0</div></div>
+                        <div class="score-stat-item"><div class="label">AVG</div><div class="value avg" id="cpuAvg">0</div></div>
+                        <div class="score-stat-item"><div class="label">MAX</div><div class="value max" id="cpuMax">0</div></div>
+                    </div>
+                </div>
+                <div class="score-stat-card">
+                    <div class="score-stat-title">🟢 RAM Score</div>
+                    <div class="score-stat-values">
+                        <div class="score-stat-item"><div class="label">MIN</div><div class="value min" id="ramMin">0</div></div>
+                        <div class="score-stat-item"><div class="label">AVG</div><div class="value avg" id="ramAvg">0</div></div>
+                        <div class="score-stat-item"><div class="label">MAX</div><div class="value max" id="ramMax">0</div></div>
+                    </div>
+                </div>
+                <div class="score-stat-card">
+                    <div class="score-stat-title">🟣 GPU Score</div>
+                    <div class="score-stat-values">
+                        <div class="score-stat-item"><div class="label">MIN</div><div class="value min" id="gpuMin">0</div></div>
+                        <div class="score-stat-item"><div class="label">AVG</div><div class="value avg" id="gpuAvg">0</div></div>
+                        <div class="score-stat-item"><div class="label">MAX</div><div class="value max" id="gpuMax">0</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-title cpu">📈 CPU History</div>
+                <div class="chart-container"><canvas id="cpuChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title ram">📈 RAM History</div>
+                <div class="chart-container"><canvas id="ramChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title gpu">📈 GPU History</div>
+                <div class="chart-container"><canvas id="gpuChart"></canvas></div>
+            </div>
+        </div>
+
+        <!-- Log -->
+        <div class="log-section">
+            <div class="log-header">
+                <div class="log-title">📋 System Log</div>
+                <button class="btn" id="btnClearLog" style="padding: 6px 14px; font-size: 0.7rem; background: #333;">Clear</button>
+            </div>
+            <div class="log-container" id="logContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        const CONFIG = {
+            MAX_PARTICLES: 300000,
+            PARTICLE_BATCH: 3000,
+            MAX_RAM_MB: 1500,
+            RAM_CHUNK_MB: 30,
+            CHART_SIZE: 60,
+            RING_CIRCUMFERENCE: 440
+        };
+
+        const state = {
+            running: { cpu: false, ram: false, gpu: false, any: false },
+            workers: [],
+            workerStats: [],
+            scores: { cpu: 0, ram: 0, gpu: 0 },
+            scoreHistory: { cpu: [], ram: [], gpu: [] },
+            usage: { cpu: 0, ram: 0, gpu: 0 },
+            charts: { cpu: [], ram: [], gpu: [] },
+            ramBuffers: [],
+            particles: [],
+            fps: { current: 0, max: 0, frames: 0, lastTime: 0 },
+            timer: { duration: 300, remaining: 300, interval: null, startTime: 0 }
+        };
+
+        const $ = id => document.getElementById(id);
+        const DOM = {
+            btnStart: $('btnStart'), btnStop: $('btnStop'),
+            btnCpu: $('btnCpu'), btnRam: $('btnRam'), btnGpu: $('btnGpu'),
+            btnClearLog: $('btnClearLog'),
+            workerGrid: $('workerGrid'), coreCount: $('coreCount'),
+            countdown: $('countdown'), countdownBar: $('countdownBar'),
+            logContainer: $('logContainer'), gpuCanvas: $('gpuCanvas'),
+            resultsSection: $('resultsSection'),
+            // Small stats
+            cpuUsageSmall: $('cpuUsageSmall'), ramUsageSmall: $('ramUsageSmall'),
+            gpuUsageSmall: $('gpuUsageSmall'), fpsDisplay: $('fpsDisplay'),
+            fpsMax: $('fpsMax'), activeWorkers: $('activeWorkers'),
+            bufferCount: $('bufferCount'), particleCount: $('particleCount'),
+            // CPU
+            cpuCard: $('cpuCard'), cpuPercent: $('cpuPercent'),
+            cpuRing: $('cpuRing'), cpuRingValue: $('cpuRingValue'),
+            cpuStatus: $('cpuStatus'), cpuOps: $('cpuOps'),
+            cpuOpsPerSec: $('cpuOpsPerSec'), cpuThreads: $('cpuThreads'), cpuScore: $('cpuScore'),
+            // RAM
+            ramCard: $('ramCard'), ramPercent: $('ramPercent'),
+            ramRing: $('ramRing'), ramRingValue: $('ramRingValue'),
+            ramStatus: $('ramStatus'), ramAllocated: $('ramAllocated'),
+            ramWrite: $('ramWrite'), ramBuffers: $('ramBuffers'), ramScore: $('ramScore'),
+            // GPU
+            gpuCard: $('gpuCard'), gpuPercent: $('gpuPercent'),
+            gpuRing: $('gpuRing'), gpuRingValue: $('gpuRingValue'),
+            gpuStatus: $('gpuStatus'), gpuParticles: $('gpuParticles'),
+            gpuDrawCalls: $('gpuDrawCalls'), gpuTriangles: $('gpuTriangles'), gpuScore: $('gpuScore'),
+            canvasParticles: $('canvasParticles'), canvasFps: $('canvasFps'),
+            // Score
+            totalScore: $('totalScore'), scoreRating: $('scoreRating'),
+            breakdownCpu: $('breakdownCpu'), breakdownRam: $('breakdownRam'), breakdownGpu: $('breakdownGpu'),
+            // Final
+            finalScore: $('finalScore'), finalRating: $('finalRating'),
+            cpuMin: $('cpuMin'), cpuAvg: $('cpuAvg'), cpuMax: $('cpuMax'),
+            ramMin: $('ramMin'), ramAvg: $('ramAvg'), ramMax: $('ramMax'),
+            gpuMin: $('gpuMin'), gpuAvg: $('gpuAvg'), gpuMax: $('gpuMax'),
+            // Charts
+            cpuChart: $('cpuChart'), ramChart: $('ramChart'), gpuChart: $('gpuChart')
+        };
+
+        const ctx = DOM.gpuCanvas.getContext('2d');
+        const numCores = navigator.hardwareConcurrency || 4;
+
+        // Utils
+        const formatNum = n => {
+            if (n >= 1e9) return (n/1e9).toFixed(2) + 'B';
+            if (n >= 1e6) return (n/1e6).toFixed(2) + 'M';
+            if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+            return Math.round(n).toString();
+        };
+
+        const formatTime = sec => {
+            const m = Math.floor(sec / 60);
+            const s = sec % 60;
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        };
+
+        const getTime = () => new Date().toTimeString().split(' ')[0];
+
+        const log = (msg, type = 'info') => {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">${getTime()}</span><span class="log-type ${type}">[${type.toUpperCase()}]</span><span class="log-msg">${msg}</span>`;
+            DOM.logContainer.appendChild(entry);
+            DOM.logContainer.scrollTop = DOM.logContainer.scrollHeight;
+        };
+
+        const setRing = (ring, percent) => {
+            ring.style.strokeDashoffset = CONFIG.RING_CIRCUMFERENCE - (percent / 100) * CONFIG.RING_CIRCUMFERENCE;
+        };
+
+        const getRating = score => {
+            if (score >= 5000000) return { text: '🏆 LEGENDARY', cls: 'legendary' };
+            if (score >= 2000000) return { text: '🔥 EXTREME', cls: 'extreme' };
+            if (score >= 1000000) return { text: '⭐ EXCELLENT', cls: 'excellent' };
+            if (score >= 500000) return { text: '✓ GOOD', cls: 'good' };
+            if (score >= 200000) return { text: '◆ AVERAGE', cls: 'average' };
+            return { text: '○ POOR', cls: 'poor' };
+        };
+
+        const getStats = arr => {
+            if (!arr.length) return { min: 0, avg: 0, max: 0 };
+            return {
+                min: Math.min(...arr),
+                avg: Math.round(arr.reduce((a,b) => a+b, 0) / arr.length),
+                max: Math.max(...arr)
+            };
+        };
+
+        // Setup
+        function setupWorkerIndicators() {
+            DOM.coreCount.textContent = numCores;
+            DOM.workerGrid.innerHTML = '';
+            for (let i = 0; i < numCores; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'worker-dot';
+                dot.id = `worker-${i}`;
+                dot.textContent = i + 1;
+                DOM.workerGrid.appendChild(dot);
+            }
+        }
+
+        function resizeCanvas() {
+            const c = DOM.gpuCanvas.parentElement;
+            DOM.gpuCanvas.width = c.clientWidth;
+            DOM.gpuCanvas.height = c.clientHeight;
+        }
+
+        function setupCharts() {
+            [DOM.cpuChart, DOM.ramChart, DOM.gpuChart].forEach(c => {
+                c.width = c.parentElement.clientWidth;
+                c.height = c.parentElement.clientHeight;
+            });
+        }
+
+        // Timer buttons
+        document.querySelectorAll('.timer-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (state.running.any) return;
+                document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.timer.duration = parseInt(btn.dataset.time);
+                state.timer.remaining = state.timer.duration;
+                DOM.countdown.textContent = formatTime(state.timer.remaining);
+                DOM.countdownBar.style.width = '100%';
+            });
+        });
+
+        // Workers
+        const workerCode = `
+            let running = false, ops = 0;
+            self.onmessage = e => {
+                if (e.data.cmd === 'start') { running = true; stress(); }
+                else if (e.data.cmd === 'stop') { running = false; }
+            };
+            function stress() {
+                if (!running) return;
+                for (let i = 0; i < 80000; i++) {
+                    const n = Math.random() * 999999;
+                    Math.sin(n) * Math.cos(n) * Math.tan(n);
+                    Math.sqrt(n) * Math.pow(n, 0.5);
+                    Math.log(n + 1) * Math.exp(n % 10);
+                    let sum = 0;
+                    for (let k = 0; k < 8; k++) sum += Math.sin(k * n);
+                    ops += 15;
+                }
+                self.postMessage({ ops });
+                setTimeout(stress, 0);
+            }
+        `;
+
+        function createWorkers() {
+            terminateWorkers();
+            const blob = new Blob([workerCode], { type: 'application/javascript' });
+            const url = URL.createObjectURL(blob);
+            for (let i = 0; i < numCores; i++) {
+                const w = new Worker(url);
+                w.onmessage = e => state.workerStats[i] = e.data.ops;
+                state.workers.push(w);
+                state.workerStats.push(0);
+            }
+            URL.revokeObjectURL(url);
+        }
+
+        function startWorkers() {
+            state.workers.forEach((w, i) => {
+                w.postMessage({ cmd: 'start' });
+                const dot = document.getElementById(`worker-${i}`);
+                if (dot) dot.classList.add('active');
+            });
+        }
+
+        function stopWorkers() {
+            state.workers.forEach((w, i) => {
+                w.postMessage({ cmd: 'stop' });
+                const dot = document.getElementById(`worker-${i}`);
+                if (dot) dot.classList.remove('active');
+            });
+        }
+
+        function terminateWorkers() {
+            state.workers.forEach(w => w.terminate());
+            state.workers = [];
+            state.workerStats = [];
+        }
+
+        // CPU Stress
+        let cpuStartTime = 0, mainOps = 0;
+
+        function cpuStress() {
+            if (!state.running.cpu) return;
+            for (let i = 0; i < 40000; i++) {
+                const n = Math.random() * 999999;
+                Math.sin(n) * Math.cos(n) * Math.tan(n);
+                mainOps += 4;
+            }
+            const totalOps = state.workerStats.reduce((a,b) => a+b, 0) + mainOps;
+            const elapsed = Math.max((performance.now() - cpuStartTime) / 1000, 0.1);
+            const opsPerSec = totalOps / elapsed;
+
+            state.usage.cpu = Math.min(100, state.usage.cpu + 3);
+            state.scores.cpu = Math.round(opsPerSec / 30);
+            state.scoreHistory.cpu.push(state.scores.cpu);
+
+            DOM.cpuPercent.textContent = Math.round(state.usage.cpu) + '%';
+            DOM.cpuRingValue.textContent = Math.round(state.usage.cpu);
+            setRing(DOM.cpuRing, state.usage.cpu);
+            DOM.cpuOps.textContent = formatNum(totalOps);
+            DOM.cpuOpsPerSec.textContent = formatNum(opsPerSec);
+            DOM.cpuThreads.textContent = numCores + 1;
+            DOM.cpuScore.textContent = formatNum(state.scores.cpu);
+            DOM.cpuUsageSmall.textContent = Math.round(state.usage.cpu) + '%';
+            DOM.activeWorkers.textContent = numCores;
+
+            state.charts.cpu.push(state.usage.cpu);
+            if (state.charts.cpu.length > CONFIG.CHART_SIZE) state.charts.cpu.shift();
+
+            setTimeout(cpuStress, 0);
+        }
+
+        function startCPU() {
+            if (state.running.cpu) return;
+            state.running.cpu = true;
+            cpuStartTime = performance.now();
+            mainOps = 0;
+            state.workerStats = state.workerStats.map(() => 0);
+            createWorkers();
+            startWorkers();
+            DOM.cpuCard.classList.add('stress');
+            DOM.cpuStatus.textContent = '🔴 RUNNING';
+            log(`CPU stress started - ${numCores + 1} threads`, 'cpu');
+            cpuStress();
+        }
+
+        function stopCPU() {
+            state.running.cpu = false;
+            stopWorkers();
+            DOM.cpuCard.classList.remove('stress');
+            DOM.cpuStatus.textContent = 'Stopped';
+        }
+
+        // RAM Stress
+        let ramStartTime = 0, totalRamAlloc = 0;
+
+        function ramStress() {
+            if (!state.running.ram) return;
+            try {
+                const chunkSize = CONFIG.RAM_CHUNK_MB * 1024 * 1024;
+                const writeStart = performance.now();
+                const buffer = new ArrayBuffer(chunkSize);
+                const view = new Float64Array(buffer);
+                for (let i = 0; i < view.length; i++) view[i] = Math.random() * i;
+                const writeTime = Math.max((performance.now() - writeStart) / 1000, 0.001);
+                const writeSpeed = (chunkSize / (1024 * 1024)) / writeTime;
+
+                state.ramBuffers.push(buffer);
+                totalRamAlloc += chunkSize;
+
+                const maxAlloc = CONFIG.MAX_RAM_MB * 1024 * 1024;
+                while (totalRamAlloc > maxAlloc && state.ramBuffers.length > 1) {
+                    totalRamAlloc -= state.ramBuffers.shift().byteLength;
+                }
+
+                const allocMB = totalRamAlloc / (1024 * 1024);
+                state.usage.ram = Math.min(100, (totalRamAlloc / maxAlloc) * 100);
+                state.scores.ram = Math.round(writeSpeed * 80 + allocMB * 5);
+                state.scoreHistory.ram.push(state.scores.ram);
+
+                DOM.ramPercent.textContent = Math.round(state.usage.ram) + '%';
+                DOM.ramRingValue.textContent = Math.round(state.usage.ram);
+                setRing(DOM.ramRing, state.usage.ram);
+                DOM.ramAllocated.textContent = allocMB.toFixed(0) + ' MB';
+                DOM.ramBuffers.textContent = state.ramBuffers.length;
+                DOM.ramWrite.textContent = writeSpeed.toFixed(0);
+                DOM.ramScore.textContent = formatNum(state.scores.ram);
+                DOM.ramUsageSmall.textContent = allocMB.toFixed(0) + ' MB';
+                DOM.bufferCount.textContent = state.ramBuffers.length;
+
+                state.charts.ram.push(state.usage.ram);
+                if (state.charts.ram.length > CONFIG.CHART_SIZE) state.charts.ram.shift();
+            } catch (e) {
+                log('RAM limit reached!', 'warn');
+            }
+            setTimeout(ramStress, 50);
+        }
+
+        function startRAM() {
+            if (state.running.ram) return;
+            state.running.ram = true;
+            ramStartTime = performance.now();
+            totalRamAlloc = 0;
+            state.ramBuffers = [];
+            DOM.ramCard.classList.add('stress');
+            DOM.ramStatus.textContent = '🟢 ALLOCATING';
+            log(`RAM stress started - Target: ${CONFIG.MAX_RAM_MB} MB`, 'ram');
+            ramStress();
+        }
+
+        function stopRAM() {
+            state.running.ram = false;
+            state.ramBuffers = [];
+            totalRamAlloc = 0;
+            DOM.ramCard.classList.remove('stress');
+            DOM.ramStatus.textContent = 'Stopped';
+        }
+
+        // GPU Stress
+        let gpuStartTime = 0, drawCalls = 0;
+
+        function createParticle() {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 6 + 2;
+            return {
+                x: DOM.gpuCanvas.width / 2,
+                y: DOM.gpuCanvas.height / 2,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                size: Math.random() * 2.5 + 0.5,
+                hue: Math.random() * 360,
+                life: 1,
+                decay: Math.random() * 0.006 + 0.002
+            };
+        }
+
+        function gpuStress() {
+            if (!state.running.gpu) {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, DOM.gpuCanvas.width, DOM.gpuCanvas.height);
+                return;
+            }
+
+            while (state.particles.length < CONFIG.MAX_PARTICLES) {
+                for (let i = 0; i < CONFIG.PARTICLE_BATCH && state.particles.length < CONFIG.MAX_PARTICLES; i++) {
+                    state.particles.push(createParticle());
+                }
+            }
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+            ctx.fillRect(0, 0, DOM.gpuCanvas.width, DOM.gpuCanvas.height);
+            drawCalls = 0;
+
+            for (let i = state.particles.length - 1; i >= 0; i--) {
+                const p = state.particles[i];
+                p.x += p.vx; p.y += p.vy;
+                p.hue = (p.hue + 1.5) % 360;
+                p.life -= p.decay;
+
+                if (p.x < 0 || p.x > DOM.gpuCanvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > DOM.gpuCanvas.height) p.vy *= -1;
+
+                if (p.life <= 0) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 6 + 2;
+                    p.x = DOM.gpuCanvas.width / 2;
+                    p.y = DOM.gpuCanvas.height / 2;
+                    p.vx = Math.cos(angle) * speed;
+                    p.vy = Math.sin(angle) * speed;
+                    p.life = 1;
+                }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size * 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${p.hue}, 100%, 50%, ${p.life * 0.4})`;
+                ctx.fill();
+                drawCalls++;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${p.hue}, 100%, 70%, ${p.life})`;
+                ctx.fill();
+                drawCalls++;
+            }
+
+            state.usage.gpu = Math.min(100, (state.particles.length / CONFIG.MAX_PARTICLES) * 100);
+            state.scores.gpu = Math.round((state.particles.length * state.fps.current) / 40);
+            state.scoreHistory.gpu.push(state.scores.gpu);
+
+            DOM.gpuPercent.textContent = Math.round(state.usage.gpu) + '%';
+            DOM.gpuRingValue.textContent = Math.round(state.usage.gpu);
+            setRing(DOM.gpuRing, state.usage.gpu);
+            DOM.gpuParticles.textContent = formatNum(state.particles.length);
+            DOM.gpuDrawCalls.textContent = formatNum(drawCalls);
+            DOM.gpuTriangles.textContent = formatNum(state.particles.length * 2);
+            DOM.gpuScore.textContent = formatNum(state.scores.gpu);
+            DOM.gpuUsageSmall.textContent = Math.round(state.usage.gpu) + '%';
+            DOM.particleCount.textContent = formatNum(state.particles.length);
+            DOM.canvasParticles.textContent = formatNum(state.particles.length);
+
+            state.charts.gpu.push(state.usage.gpu);
+            if (state.charts.gpu.length > CONFIG.CHART_SIZE) state.charts.gpu.shift();
+
+            // Use setTimeout(0) for uncapped FPS instead of requestAnimationFrame
+            setTimeout(gpuStress, 0);
+        }
+
+        function startGPU() {
+            if (state.running.gpu) return;
+            state.running.gpu = true;
+            gpuStartTime = performance.now();
+            state.particles = [];
+            DOM.gpuCard.classList.add('stress');
+            DOM.gpuStatus.textContent = '🟣 RENDERING';
+            log(`GPU stress started - Target: ${formatNum(CONFIG.MAX_PARTICLES)} particles`, 'gpu');
+            gpuStress();
+        }
+
+        function stopGPU() {
+            state.running.gpu = false;
+            state.particles = [];
+            DOM.gpuCard.classList.remove('stress');
+            DOM.gpuStatus.textContent = 'Stopped';
+        }
+
+        // Uncapped FPS Counter
+        let fpsFrames = 0, lastFpsUpdate = performance.now();
+
+        function fpsLoop() {
+            fpsFrames++;
+            const now = performance.now();
+            if (now - lastFpsUpdate >= 100) {
+                state.fps.current = Math.round((fpsFrames / (now - lastFpsUpdate)) * 1000);
+                if (state.fps.current > state.fps.max) state.fps.max = state.fps.current;
+                DOM.fpsDisplay.textContent = state.fps.current;
+                DOM.fpsMax.textContent = state.fps.max;
+                DOM.canvasFps.textContent = state.fps.current;
+                fpsFrames = 0;
+                lastFpsUpdate = now;
+            }
+            // Uncapped loop
+            setTimeout(fpsLoop, 0);
+        }
+
+        // Timer
+        function startTimer() {
+            state.timer.remaining = state.timer.duration;
+            state.timer.startTime = Date.now();
+            state.timer.interval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - state.timer.startTime) / 1000);
+                state.timer.remaining = Math.max(0, state.timer.duration - elapsed);
+                DOM.countdown.textContent = formatTime(state.timer.remaining);
+                DOM.countdownBar.style.width = ((state.timer.remaining / state.timer.duration) * 100) + '%';
+
+                if (state.timer.remaining <= 0) {
+                    finishBenchmark();
+                }
+            }, 100);
+        }
+
+        function stopTimer() {
+            if (state.timer.interval) {
+                clearInterval(state.timer.interval);
+                state.timer.interval = null;
+            }
+        }
+
+        // Benchmark Control
+        function startBenchmark() {
+            state.running.any = true;
+            state.scoreHistory = { cpu: [], ram: [], gpu: [] };
+            state.usage = { cpu: 0, ram: 0, gpu: 0 };
+            state.scores = { cpu: 0, ram: 0, gpu: 0 };
+            state.charts = { cpu: [], ram: [], gpu: [] };
+            state.fps.max = 0;
+
+            DOM.resultsSection.classList.remove('show');
+            DOM.btnStart.disabled = true;
+            DOM.btnStop.disabled = false;
+            document.querySelectorAll('.timer-btn').forEach(b => b.disabled = true);
+
+            startTimer();
+            startCPU();
+            startRAM();
+            startGPU();
+
+            log(`Benchmark started - Duration: ${formatTime(state.timer.duration)}`, 'info');
+        }
+
+        function stopBenchmark() {
+            state.running.any = false;
+            stopTimer();
+            stopCPU();
+            stopRAM();
+            stopGPU();
+
+            DOM.btnStart.disabled = false;
+            DOM.btnStop.disabled = true;
+            document.querySelectorAll('.timer-btn').forEach(b => b.disabled = false);
+
+            log('Benchmark stopped by user', 'warn');
+        }
+
+        function finishBenchmark() {
+            state.running.any = false;
+            stopTimer();
+            stopCPU();
+            stopRAM();
+            stopGPU();
+
+            DOM.btnStart.disabled = false;
+            DOM.btnStop.disabled = true;
+            document.querySelectorAll('.timer-btn').forEach(b => b.disabled = false);
+
+            // Calculate results
+            const cpuStats = getStats(state.scoreHistory.cpu);
+            const ramStats = getStats(state.scoreHistory.ram);
+            const gpuStats = getStats(state.scoreHistory.gpu);
+            const finalTotal = cpuStats.avg + ramStats.avg + gpuStats.avg;
+            const rating = getRating(finalTotal);
+
+            // Update results UI
+            DOM.finalScore.textContent = formatNum(finalTotal);
+            DOM.finalRating.innerHTML = `<span class="category-badge ${rating.cls}" style="margin-top:15px;display:inline-block;padding:10px 30px;font-size:1rem;">${rating.text}</span>`;
+
+            DOM.cpuMin.textContent = formatNum(cpuStats.min);
+            DOM.cpuAvg.textContent = formatNum(cpuStats.avg);
+            DOM.cpuMax.textContent = formatNum(cpuStats.max);
+
+            DOM.ramMin.textContent = formatNum(ramStats.min);
+            DOM.ramAvg.textContent = formatNum(ramStats.avg);
+            DOM.ramMax.textContent = formatNum(ramStats.max);
+
+            DOM.gpuMin.textContent = formatNum(gpuStats.min);
+            DOM.gpuAvg.textContent = formatNum(gpuStats.avg);
+            DOM.gpuMax.textContent = formatNum(gpuStats.max);
+
+            DOM.resultsSection.classList.add('show');
+            DOM.resultsSection.scrollIntoView({ behavior: 'smooth' });
+
+            log(`🏁 Benchmark complete! Final Score: ${formatNum(finalTotal)} - ${rating.text}`, 'done');
+        }
+
+        // Charts
+        function drawChart(cvs, data, color) {
+            const c = cvs.getContext('2d');
+            const w = cvs.width, h = cvs.height;
+            c.clearRect(0, 0, w, h);
+            if (data.length < 2) return;
+
+            c.strokeStyle = 'rgba(255,255,255,0.03)';
+            c.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                c.beginPath();
+                c.moveTo(0, (h/4)*i);
+                c.lineTo(w, (h/4)*i);
+                c.stroke();
+            }
+
+            const step = w / (CONFIG.CHART_SIZE - 1);
+            c.beginPath();
+            c.strokeStyle = color;
+            c.lineWidth = 2;
+            for (let i = 0; i < data.length; i++) {
+                const x = i * step;
+                const y = h - (data[i] / 100) * h;
+                i === 0 ? c.moveTo(x, y) : c.lineTo(x, y);
+            }
+            c.stroke();
+
+            c.lineTo((data.length - 1) * step, h);
+            c.lineTo(0, h);
+            c.closePath();
+            c.fillStyle = color.replace('rgb', 'rgba').replace(')', ', 0.15)');
+            c.fill();
+        }
+
+        // Score update
+        function updateScore() {
+            const total = state.scores.cpu + state.scores.ram + state.scores.gpu;
+            const rating = getRating(total);
+            DOM.totalScore.textContent = formatNum(total);
+            DOM.breakdownCpu.textContent = formatNum(state.scores.cpu);
+            DOM.breakdownRam.textContent = formatNum(state.scores.ram);
+            DOM.breakdownGpu.textContent = formatNum(state.scores.gpu);
+            DOM.scoreRating.innerHTML = `<span class="category-badge ${rating.cls}" style="margin-top:10px;display:inline-block;">${rating.text}</span>`;
+        }
+
+        // Main loop
+        function mainLoop() {
+            drawChart(DOM.cpuChart, state.charts.cpu, 'rgb(255, 45, 85)');
+            drawChart(DOM.ramChart, state.charts.ram, 'rgb(48, 209, 88)');
+            drawChart(DOM.gpuChart, state.charts.gpu, 'rgb(191, 90, 242)');
+            updateScore();
+            requestAnimationFrame(mainLoop);
+        }
+
+        // Events
+        DOM.btnStart.addEventListener('click', startBenchmark);
+        DOM.btnStop.addEventListener('click', stopBenchmark);
+
+        DOM.btnCpu.addEventListener('click', () => {
+            if (!state.running.any) {
+                state.running.any = true;
+                state.scoreHistory.cpu = [];
+                DOM.btnStart.disabled = true;
+                DOM.btnStop.disabled = false;
+                startTimer();
+                startCPU();
+            }
+        });
+
+        DOM.btnRam.addEventListener('click', () => {
+            if (!state.running.any) {
+                state.running.any = true;
+                state.scoreHistory.ram = [];
+                DOM.btnStart.disabled = true;
+                DOM.btnStop.disabled = false;
+                startTimer();
+                startRAM();
+            }
+        });
+
+        DOM.btnGpu.addEventListener('click', () => {
+            if (!state.running.any) {
+                state.running.any = true;
+                state.scoreHistory.gpu = [];
+                DOM.btnStart.disabled = true;
+                DOM.btnStop.disabled = false;
+                startTimer();
+                startGPU();
+            }
+        });
+
+        DOM.btnClearLog.addEventListener('click', () => {
+            DOM.logContainer.innerHTML = '';
+            log('Log cleared', 'info');
+        });
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            setupCharts();
+        });
+
+        // Init
+        function init() {
+            setupWorkerIndicators();
+            resizeCanvas();
+            setupCharts();
+            state.timer.remaining = state.timer.duration;
+            DOM.countdown.textContent = formatTime(state.timer.remaining);
+            log('⚡ Ultra Benchmark Pro initialized', 'info');
+            log(`Detected ${numCores} CPU cores`, 'cpu');
+            log(`RAM target: ${CONFIG.MAX_RAM_MB} MB`, 'ram');
+            log(`GPU particles: ${formatNum(CONFIG.MAX_PARTICLES)}`, 'gpu');
+            fpsLoop();
+            mainLoop();
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
